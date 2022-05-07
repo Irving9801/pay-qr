@@ -80,25 +80,25 @@ const SignUp = ({navigation}) => {
     );
   }
 
-  function renderLogo() {
-    return (
-      <View
-        style={{
-          marginTop: SIZES.padding * 5,
-          height: 100,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Image
-          source={images.wallieLogo}
-          resizeMode="contain"
-          style={{
-            width: '60%',
-          }}
-        />
-      </View>
-    );
-  }
+  // function renderLogo() {
+  //   return (
+  //     <View
+  //       style={{
+  //         marginTop: SIZES.padding * 5,
+  //         height: 100,
+  //         alignItems: 'center',
+  //         justifyContent: 'center',
+  //       }}>
+  //       <Image
+  //         source={images.wallieLogo}
+  //         resizeMode="contain"
+  //         style={{
+  //           width: '60%',
+  //         }}
+  //       />
+  //     </View>
+  //   );
+  // }
 
   function renderForm() {
     return (
@@ -310,7 +310,7 @@ const SignUp = ({navigation}) => {
       <LinearGradient colors={[COLORS.lime, COLORS.emerald]} style={{flex: 1}}>
         <ScrollView>
           {renderHeader()}
-          {renderLogo()}
+          {/* {renderLogo()} */}
           {renderForm()}
           {renderButton()}
         </ScrollView>
