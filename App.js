@@ -6,11 +6,12 @@
  * @flow strict-local
  */
 
-import React from 'react';
-import { SignUp } from "./screens";
+import React, {useEffect} from 'react';
+import {SignUp} from './screens';
 import {createStackNavigator} from '@react-navigation/stack';
+import {SafeAreaView, Text, View} from 'react-native';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
-
+import RNBootSplash from 'react-native-bootsplash';
 
 const theme = {
   ...DefaultTheme,
@@ -21,14 +22,19 @@ const theme = {
 };
 const Stack = createStackNavigator();
 const App = () => {
+  useEffect(() => {
+    setTimeout(() => {
+      RNBootSplash.hide({fade: true});
+    }, 2000);
+  }, []);
   return (
     <NavigationContainer theme={theme}>
       <Stack.Navigator
         screenOptions={{
-          headerShown: false
-      }}
-      initialRouteName={'SignUp'}>
-       <Stack.Screen name="SignUp" component={SignUp} />
+          headerShown: false,
+        }}
+        initialRouteName={'SignUp'}>
+        <Stack.Screen name="SignUp" component={SignUp} />
       </Stack.Navigator>
     </NavigationContainer>
   );
