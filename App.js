@@ -30,9 +30,15 @@ const App = () => {
     }, 2000);
   }, []);
   return (
-    <SafeAreaView>
-    <Login/>
-  </SafeAreaView>
+    <NavigationContainer theme={theme}>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+      initialRouteName={'Login'}>
+      <Stack.Screen name="Login" component={Login} />
+    </Stack.Navigator>
+  </NavigationContainer>
 );
 };
     
