@@ -9,9 +9,11 @@
 import React, {useEffect} from 'react';
 import {SignUp} from './screens';
 import {createStackNavigator} from '@react-navigation/stack';
-import {SafeAreaView, Text, View} from 'react-native';
+import {SafeAreaView, Text, View, StyleSheet} from 'react-native';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import RNBootSplash from 'react-native-bootsplash';
+import Login from './screens/Login';
+
 
 const theme = {
   ...DefaultTheme,
@@ -28,15 +30,25 @@ const App = () => {
     }, 2000);
   }, []);
   return (
-    <NavigationContainer theme={theme}>
+    <SafeAreaView>
+    <Login/>
+  </SafeAreaView>
+);
+};
+    
+  /*  <NavigationContainer theme={theme}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
         }}
-        initialRouteName={'SignUp'}>
-        <Stack.Screen name="SignUp" component={SignUp} />
+        initialRouteName={'Login'}>
+        <Stack.Screen name="Login" component={Login} />
       </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
+    </NavigationContainer>*/
+
+ const styles = StyleSheet.create({
+   root:{
+     backgroundColor:'grey',
+   }
+ })
 export default App;
