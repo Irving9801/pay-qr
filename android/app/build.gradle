@@ -130,6 +130,12 @@ def reactNativeArchitectures() {
 }
 
 android {
+  defaultConfig {
+    missingDimensionStrategy 'react-native-camera', 'general' 
+  }
+}
+
+android {
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion

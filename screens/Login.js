@@ -11,12 +11,12 @@ import Logo from '../assets/images/Logo.png';
 import CustomInput from '../components/CustomInput';
 import CustomButtom from '../components/CustomButton/CustomButton';
 
-const Login = () => {
+const Login = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const {height} = useWindowDimensions();
   const onSignInPressed = () => {
-    console.warn('Sign In');
+   navigation.navigate('Home');
   };
   const onForgotPasswordPressed = () => {
     console.warn('onForgotPasswordPressed');

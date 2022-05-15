@@ -7,14 +7,12 @@
  */
 
 import React, {useEffect} from 'react';
-import {SignUp} from './screens';
+import {SignUp,Login} from './screens';
 import {createStackNavigator} from '@react-navigation/stack';
 import {SafeAreaView, Text, View, StyleSheet} from 'react-native';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import RNBootSplash from 'react-native-bootsplash';
-import Login from './screens/Login';
-
-
+import Tabs from './navigation/tabs';
 const theme = {
   ...DefaultTheme,
   colors: {
@@ -31,18 +29,20 @@ const App = () => {
   }, []);
   return (
     <NavigationContainer theme={theme}>
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-      initialRouteName={'Login'}>
-      <Stack.Screen name="Login" component={Login} />
-    </Stack.Navigator>
-  </NavigationContainer>
-);
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+        initialRouteName={'Login'}>
+        <Stack.Screen name="Login" component={SignUp} />
+        {/*Tabs */}
+        <Stack.Screen name="Home" component={Tabs} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 };
-    
-  /*  <NavigationContainer theme={theme}>
+
+/*  <NavigationContainer theme={theme}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -52,9 +52,9 @@ const App = () => {
       </Stack.Navigator>
     </NavigationContainer>*/
 
- const styles = StyleSheet.create({
-   root:{
-     backgroundColor:'grey',
-   }
- })
+const styles = StyleSheet.create({
+  root: {
+    backgroundColor: 'grey',
+  },
+});
 export default App;
