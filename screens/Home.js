@@ -1,37 +1,74 @@
-import React from 'react';
-import {View, Text} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  useColorScheme,
+  Modal,
+  Switch,
+  Button,
+  TouchableWithoutFeedback,
+  ScrollView,
+} from 'react-native';
+import {Avatar, Icon, PricingCard, Card} from 'react-native-elements';
 import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Image} from 'react-native-svg';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {COLORS, FONTS, icons, images, SIZES} from '../constants';
-const Home = () => {
-  const specialPromoData = [
+import {useDispatch, useSelector} from 'react-redux';
+import {getPlanes} from '../store/action/shortDataAction';
+import Saldo from './Saldo';
+const Tab = createBottomTabNavigator();
+const Home = ({navigation}) => {
+  const dispatch = useDispatch();
+  const getPlanesList = useSelector(
+    state => state.getPlane.userGetPlan.products,
+  );
+  useEffect(() => {
+    dispatch(getPlanes());
+  }, []);
+
+  const featuresData = [
     {
       id: 1,
-      img: images.promoBanner,
-      title: 'Bonus Cashback1',
-      description: "Don't miss it. Grab it now!",
+      icon: icons.reload,
+      color: COLORS.purple,
+      backgroundColor: COLORS.lightpurple,
+      description: 'Pagar',
     },
     {
       id: 2,
-      img: images.promoBanner,
-      title: 'Bonus Cashback2',
-      description: "Don't miss it. Grab it now!",
+      icon: icons.send,
+      color: COLORS.yellow,
+      backgroundColor: COLORS.lightyellow,
+      description: 'Movimientos',
     },
     {
       id: 3,
-      img: images.promoBanner,
-      title: 'Bonus Cashback3',
-      description: "Don't miss it. Grab it now!",
+      icon: icons.internet,
+      color: COLORS.primary,
+      backgroundColor: COLORS.lightGreen,
+      description: 'Saldo',
     },
     {
       id: 4,
-      img: images.promoBanner,
-      title: 'Bonus Cashback4',
-      description: "Don't miss it. Grab it now!",
+      icon: icons.wallet,
+      color: COLORS.red,
+      backgroundColor: COLORS.lightRed,
+      description: 'Pagos',
+    },
+    {
+      id: 5,
+      icon: icons.bill,
+      color: COLORS.yellow,
+      backgroundColor: COLORS.lightyellow,
+      description: 'Perfil',
     },
   ];
-  const [specialPromos, setSpecialPromos] = React.useState(specialPromoData);
+
+  const [features, setFeatures] = React.useState(featuresData);
+  const [specialPromos, setSpecialPromos] = React.useState(getPlanesList);
   function renderHeader() {
     return (
       <View style={{flexDirection: 'row', marginVertical: SIZES.padding * 2}}>
@@ -74,33 +111,94 @@ const Home = () => {
       </View>
     );
   }
-  function renderBanner() {
-    return (
-      <View
-        style={{
-          height: 120,
-          borderRadius: 20,
-        }}>
-        <Image
-          source={images.banner}
-          resizeMode="cover"
-          style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: 20,
-          }}
-        />
+
+  function renderFeatures() {
+    const Header = () => (
+      <View style={{marginBottom: SIZES.padding * 2}}>
+        <Text style={{...FONTS.h3}}>Atajos</Text>
       </View>
     );
-  }
 
+    const renderItem = ({item}) => (
+      <TouchableOpacity
+        style={{
+          marginBottom: SIZES.padding * 2,
+          width: 60,
+          alignItems: 'center',
+        }}
+        onPress={() => handlePress(item.description)}>
+        <View
+          style={{
+            height: 50,
+            width: 50,
+            marginBottom: 5,
+            borderRadius: 20,
+            backgroundColor: item.backgroundColor,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Image
+            source={item.icon}
+            resizeMode="contain"
+            style={{
+              height: 20,
+              width: 20,
+              tintColor: item.color,
+            }}
+          />
+        </View>
+        <Text style={{textAlign: 'center', flexWrap: 'wrap', ...FONTS.body4}}>
+          {item.description}
+        </Text>
+      </TouchableOpacity>
+    );
+
+    return (
+      <FlatList
+        ListHeaderComponent={Header}
+        data={features}
+        numColumns={4}
+        columnWrapperStyle={{justifyContent: 'space-between'}}
+        keyExtractor={item => `${item.id}`}
+        renderItem={renderItem}
+        style={{marginTop: SIZES.padding * 2}}
+        onPress={e => {
+          handlePress(e);
+        }}
+      />
+    );
+  }
+  const handlePress = e => {
+    if (e === 'Saldo') {
+      navigation.navigate('Saldo');
+    } else if (e === 'Perfil') {
+      navigation.navigate('User');
+    }
+  };
   function renderPromos() {
     const HeaderComponent = () => (
       <View>
         {renderHeader()}
-        {renderBanner()}
+        {renderFeatures()}
+        {renderPromoHeader()}
       </View>
     );
+
+    const renderPromoHeader = () => (
+      <View
+        style={{
+          flexDirection: 'row',
+          marginBottom: SIZES.padding,
+        }}>
+        <View style={{flex: 1}}>
+          <Text style={{...FONTS.h3}}>Planes disponibles</Text>
+        </View>
+        <TouchableOpacity onPress={() => console.log('View All')}>
+          <Text style={{color: COLORS.gray, ...FONTS.body4}}>View All</Text>
+        </TouchableOpacity>
+      </View>
+    );
+
     const renderItem = ({item}) => (
       <TouchableOpacity
         style={{
@@ -134,11 +232,12 @@ const Home = () => {
             borderBottomLeftRadius: 20,
             borderBottomRightRadius: 20,
           }}>
-          <Text style={{...FONTS.h4}}>{item.title}</Text>
-          <Text style={{...FONTS.body4}}>{item.description}</Text>
+          <Text style={{...FONTS.h4}}>{item.namePlane}</Text>
+          <Text style={{...FONTS.body4}}>{item.descriptionPlane}</Text>
         </View>
       </TouchableOpacity>
     );
+
     return (
       <FlatList
         ListHeaderComponent={HeaderComponent}
@@ -155,9 +254,10 @@ const Home = () => {
   }
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.fondo}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.white}}>
       {renderPromos()}
     </SafeAreaView>
   );
 };
+
 export default Home;

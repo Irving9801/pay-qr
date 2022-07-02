@@ -7,12 +7,17 @@
  */
 
 import React, {useEffect} from 'react';
-import {SignUp,Login} from './screens';
+import {SignUp, Login} from './screens';
 import {createStackNavigator} from '@react-navigation/stack';
-import {SafeAreaView, Text, View, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import RNBootSplash from 'react-native-bootsplash';
 import Tabs from './navigation/tabs';
+import {Provider} from 'react-redux';
+import store from './config/store';
+import Saldo from './screens/Saldo';
+import MyStack from './navigation/MyStack';
+import ProfileScreen from './screens/ProfileScreen';
 const theme = {
   ...DefaultTheme,
   colors: {
@@ -28,30 +33,20 @@ const App = () => {
     }, 2000);
   }, []);
   return (
-    <NavigationContainer theme={theme}>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-        initialRouteName={'Login'}>
-        <Stack.Screen name="Login" component={SignUp} />
-        {/*Tabs */}
-        <Stack.Screen name="Home" component={Tabs} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <React.StrictMode>
+      <Provider store={store}>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name="Login" component={SignUp} />
+            <Stack.Screen name="Home" component={Tabs} />
+            <Stack.Screen name="Saldo" component={Saldo} />
+            <Stack.Screen name="User" component={ProfileScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </Provider>
+    </React.StrictMode>
   );
 };
-
-/*  <NavigationContainer theme={theme}>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-        initialRouteName={'Login'}>
-        <Stack.Screen name="Login" component={Login} />
-      </Stack.Navigator>
-    </NavigationContainer>*/
-
 const styles = StyleSheet.create({
   root: {
     backgroundColor: 'grey',

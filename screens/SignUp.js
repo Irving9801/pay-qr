@@ -16,7 +16,7 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import {COLORS, SIZES, FONTS, icons, images} from '../constants';
 
-const SignUp = ({navigation}) => {
+const SignUp = ({navigation}) => {                                                                                      
   const [showPassword, setShowPassword] = React.useState(false);
 
   const [areas, setAreas] = React.useState([]);
@@ -74,7 +74,7 @@ const SignUp = ({navigation}) => {
             color: COLORS.white,
             ...FONTS.h4,
           }}>
-          Sign Up
+          Registrarse
         </Text>
       </TouchableOpacity>
     );
@@ -110,7 +110,7 @@ const SignUp = ({navigation}) => {
         {/* Full Name */}
         <View style={{marginTop: SIZES.padding * 3}}>
           <Text style={{color: COLORS.lightGreen, ...FONTS.body3}}>
-            Full Name
+            Nombre completo
           </Text>
           <TextInput
             style={{
@@ -121,7 +121,7 @@ const SignUp = ({navigation}) => {
               color: COLORS.white,
               ...FONTS.body3,
             }}
-            placeholder="Enter Full Name"
+            placeholder="Introduzca nombre completo..."
             placeholderTextColor={COLORS.white}
             selectionColor={COLORS.white}
           />
@@ -130,7 +130,7 @@ const SignUp = ({navigation}) => {
         {/* Phone Number */}
         <View style={{marginTop: SIZES.padding * 2}}>
           <Text style={{color: COLORS.lightGreen, ...FONTS.body3}}>
-            Phone Number
+          Número de teléfono
           </Text>
 
           <View style={{flexDirection: 'row'}}>
@@ -185,7 +185,7 @@ const SignUp = ({navigation}) => {
                 color: COLORS.white,
                 ...FONTS.body3,
               }}
-              placeholder="Enter Phone Number"
+              placeholder="Introduzca número de teléfono..."
               placeholderTextColor={COLORS.white}
               selectionColor={COLORS.white}
             />
@@ -195,7 +195,7 @@ const SignUp = ({navigation}) => {
         {/* Password */}
         <View style={{marginTop: SIZES.padding * 2}}>
           <Text style={{color: COLORS.lightGreen, ...FONTS.body3}}>
-            Password
+            Contraseña
           </Text>
           <TextInput
             style={{
@@ -206,7 +206,7 @@ const SignUp = ({navigation}) => {
               color: COLORS.white,
               ...FONTS.body3,
             }}
-            placeholder="Enter Password"
+            placeholder="Introduzca la contraseña..."
             placeholderTextColor={COLORS.white}
             selectionColor={COLORS.white}
             secureTextEntry={!showPassword}
@@ -246,7 +246,7 @@ const SignUp = ({navigation}) => {
             justifyContent: 'center',
           }}
           onPress={() => navigation.navigate('Home')}>
-          <Text style={{color: COLORS.white, ...FONTS.h3}}>Continue</Text>
+          <Text style={{color: COLORS.white, ...FONTS.h3}}>Continuar</Text>
         </TouchableOpacity>
       </View>
     );
