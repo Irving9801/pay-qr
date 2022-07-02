@@ -11,27 +11,13 @@ import {SignUp, Login} from './screens';
 import {createStackNavigator} from '@react-navigation/stack';
 import {StyleSheet} from 'react-native';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
-import RNBootSplash from 'react-native-bootsplash';
 import Tabs from './navigation/tabs';
 import {Provider} from 'react-redux';
 import store from './config/store';
 import Saldo from './screens/Saldo';
-import MyStack from './navigation/MyStack';
 import ProfileScreen from './screens/ProfileScreen';
-const theme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    border: 'transparent',
-  },
-};
 const Stack = createStackNavigator();
 const App = () => {
-  useEffect(() => {
-    setTimeout(() => {
-      RNBootSplash.hide({fade: true});
-    }, 2000);
-  }, []);
   return (
     <React.StrictMode>
       <Provider store={store}>

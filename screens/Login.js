@@ -25,7 +25,7 @@ const Login = ({navigation}) => {
   useEffect(() => {
     if (listarMenu) {
       console.log("asDADADASDADAD")
-      navigation.navigate('Home');
+      navigation.navigate('Profile');
     }
   }, [listarMenu]);
   const {height} = useWindowDimensions();
