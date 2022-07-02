@@ -1,16 +1,8 @@
-import {NavigationContainer} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
-  useColorScheme,
-  Modal,
-  Switch,
-  Button,
-  TouchableWithoutFeedback,
-  ScrollView,
 } from 'react-native';
-import {Avatar, Icon, PricingCard, Card} from 'react-native-elements';
 import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Image} from 'react-native-svg';
@@ -18,7 +10,6 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {COLORS, FONTS, icons, images, SIZES} from '../constants';
 import {useDispatch, useSelector} from 'react-redux';
 import {getPlanes} from '../store/action/shortDataAction';
-import Saldo from './Saldo';
 const Tab = createBottomTabNavigator();
 const Home = ({navigation}) => {
   const dispatch = useDispatch();
