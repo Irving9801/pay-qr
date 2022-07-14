@@ -9,18 +9,59 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
+import Toast from 'react-native-toast-message';
+import Axios from 'axios';
+import {useDispatch, useSelector} from 'react-redux';
 const Scan = () => {
   const [inputText, setInputText] = useState('');
   const [qrvalue, setQrvalue] = useState('');
-
+  const qr = '2';
+  const pae = 1;
+  console.log(qr > pae)
+  const createTrans = async () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyY2QyNzQyYmRmZDk0YWQ1ZDY3NWUzMiIsImlhdCI6MTY1NzY3ODQ0MSwiZXhwIjoxNjYwMjcwNDQxfQ.YTBfdMbm9JBmA3X1eqhXGHGkYnSenXrQZzvqQQl0cNM`,
+      },
+    };
+    // getPlane.selectedData
+    if (qr > pae) {
+      const showToast = () => {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Lo sentimos, tu saldo es inferior al monto a pagar 😥',
+        });
+      };
+      showToast();
+    } else {
+      Axios.post(
+        `https://ws-production-b7ca.up.railway.app/api/trans`,
+        {
+          user: '62cd2742bdfd94ad5d675e32',
+          pago: pae,
+          toUser: '62ce3866aff3e2ac5004d82e',
+        },
+        config,
+      )
+        .then(response => {
+          const {data} = response;
+          console.log(data);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  };
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={styles.container}>
         <Text style={styles.titleStyle}>
-        Genera y utiliza el QR generado para pagar tu pasaje
+          Genera y utiliza el QR generado para pagar tu pasaje
         </Text>
         <QRCode
-          value={qrvalue ? qrvalue : 'NA'}
+          value={qr}
           size={250}
           color="black"
           backgroundColor="white"
@@ -31,18 +72,9 @@ const Scan = () => {
           logoMargin={2}
           logoBorderRadius={15}
         />
-        <Text style={styles.textStyle}>
-          Monto a pagar $0.20
-        </Text>
-        <TextInput
-          style={styles.textInputStyle}
-          onChangeText={inputText => setInputText(inputText)}
-          placeholder="Enter Any Value here"
-          value={inputText}
-        />
-        <TouchableOpacity
-          style={styles.buttonStyle}
-          onPress={() => setQrvalue(inputText)}>
+        <Text style={styles.textStyle}>Monto a pagar ${qr}</Text>
+
+        <TouchableOpacity style={styles.buttonStyle} onPress={createTrans}>
           <Text style={styles.buttonTextStyle}>Generar codigo para pagar</Text>
         </TouchableOpacity>
       </View>

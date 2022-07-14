@@ -1,24 +1,21 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-} from 'react-native';
+import {View, Text, Modal, StyleSheet, Animated, Button} from 'react-native';
 import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Image} from 'react-native-svg';
+import {Image, Circle} from 'react-native-svg';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {COLORS, FONTS, icons, images, SIZES} from '../constants';
 import {useDispatch, useSelector} from 'react-redux';
 import {getPlanes} from '../store/action/shortDataAction';
+import imgSvg from './x.png';
+import { SELECTED_PLANE } from '../store/redux/mainReducer';
 const Tab = createBottomTabNavigator();
 const Home = ({navigation}) => {
+  const [visible, setVisible] = React.useState(false);
+  const [indexOp, setIndex] = React.useState(0);
   const dispatch = useDispatch();
-  const getPlanesList = useSelector(
-    state => state.getPlane.userGetPlan.products,
-  );
-  useEffect(() => {
-    dispatch(getPlanes());
-  }, []);
+  const {products, loading} = useSelector(state => state.getPlane?.userGetPlan);
+  const {typeUser} = useSelector(state => state.userReducer.userInfo);
 
   const featuresData = [
     {
@@ -59,7 +56,7 @@ const Home = ({navigation}) => {
   ];
 
   const [features, setFeatures] = React.useState(featuresData);
-  const [specialPromos, setSpecialPromos] = React.useState(getPlanesList);
+  const [specialPromos, setSpecialPromos] = React.useState(products);
   function renderHeader() {
     return (
       <View style={{flexDirection: 'row', marginVertical: SIZES.padding * 2}}>
@@ -102,6 +99,40 @@ const Home = ({navigation}) => {
       </View>
     );
   }
+  const ModalPoup = ({visible, children}) => {
+    const [showModal, setShowModal] = React.useState(visible);
+    const scaleValue = React.useRef(new Animated.Value(0)).current;
+    React.useEffect(() => {
+      toggleModal();
+    }, [visible]);
+    const toggleModal = () => {
+      if (visible) {
+        setShowModal(true);
+        Animated.spring(scaleValue, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      } else {
+        setTimeout(() => setShowModal(false), 200);
+        Animated.timing(scaleValue, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }
+    };
+    return (
+      <Modal transparent visible={showModal}>
+        <View style={styles.modalBackGround}>
+          <Animated.View
+            style={[styles.modalContainer, {transform: [{scale: scaleValue}]}]}>
+            {children}
+          </Animated.View>
+        </View>
+      </Modal>
+    );
+  };
 
   function renderFeatures() {
     const Header = () => (
@@ -109,7 +140,6 @@ const Home = ({navigation}) => {
         <Text style={{...FONTS.h3}}>Atajos</Text>
       </View>
     );
-
     const renderItem = ({item}) => (
       <TouchableOpacity
         style={{
@@ -150,7 +180,7 @@ const Home = ({navigation}) => {
         data={features}
         numColumns={4}
         columnWrapperStyle={{justifyContent: 'space-between'}}
-        keyExtractor={item => `${item.id}`}
+        keyExtractor={item => `${item._id}`}
         renderItem={renderItem}
         style={{marginTop: SIZES.padding * 2}}
         onPress={e => {
@@ -159,6 +189,7 @@ const Home = ({navigation}) => {
       />
     );
   }
+
   const handlePress = e => {
     if (e === 'Saldo') {
       navigation.navigate('Saldo');
@@ -184,19 +215,71 @@ const Home = ({navigation}) => {
         <View style={{flex: 1}}>
           <Text style={{...FONTS.h3}}>Planes disponibles</Text>
         </View>
-        <TouchableOpacity onPress={() => console.log('View All')}>
-          <Text style={{color: COLORS.gray, ...FONTS.body4}}>View All</Text>
-        </TouchableOpacity>
       </View>
     );
 
-    const renderItem = ({item}) => (
+    const renderItem = ({item, index}) => (
       <TouchableOpacity
         style={{
           marginVertical: SIZES.base,
           width: SIZES.width / 2.5,
         }}
-        onPress={() => console.log(item.title)}>
+        onPress={e => {
+          setVisible(true), setIndex(index);
+        }}>
+        <ModalPoup visible={visible}>
+          <View style={{alignItems: 'center'}}>
+            <View style={styles.header}>
+              <Button
+                title="X"
+                backgroundColor="#96d0e3"
+                color="#E0ECFF"
+                // style={{color: '#E0ECFF', backgroundColor: '#96d0e3'}}
+                onPress={() => setVisible(false)}
+              />
+            </View>
+          </View>
+
+          <Text
+            style={{
+              textAlign: 'center',
+              fontSize: 20,
+              fontWeight: 'bold',
+              height: 60,
+            }}>
+            {products[indexOp]?.namePlane}
+          </Text>
+          <Text
+            style={{
+              textAlign: 'center',
+              fontSize: 16,
+              fontWeight: 'bold',
+              height: 60,
+            }}>
+            {products[indexOp]?.descriptionPlane}
+          </Text>
+          <Text
+            style={{
+              textAlign: 'center',
+              fontSize: 20,
+              fontWeight: 'bold',
+              height: 60,
+            }}>
+            {products[indexOp]?.price}
+          </Text>
+          <Button
+            title="Comprar"
+            color="#841584"
+            style={{}}
+            onPress={e => {
+              navigation.navigate('Payment'),
+                dispatch({
+                  type: SELECTED_PLANE,
+                  payload: products[indexOp]?._id,
+                });
+            }}
+          />
+        </ModalPoup>
         <View
           style={{
             height: 80,
@@ -223,8 +306,10 @@ const Home = ({navigation}) => {
             borderBottomLeftRadius: 20,
             borderBottomRightRadius: 20,
           }}>
-          <Text style={{...FONTS.h4}}>{item.namePlane}</Text>
-          <Text style={{...FONTS.body4}}>{item.descriptionPlane}</Text>
+          <Text style={{...FONTS.h4}}>{products[index].namePlane}</Text>
+          <Text style={{...FONTS.body4}}>
+            {products[index].descriptionPlane}
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -232,12 +317,14 @@ const Home = ({navigation}) => {
     return (
       <FlatList
         ListHeaderComponent={HeaderComponent}
+        data={specialPromos}
         contentContainerStyle={{paddingHorizontal: SIZES.padding * 3}}
         numColumns={2}
+        vc
         columnWrapperStyle={{justifyContent: 'space-between'}}
-        data={specialPromos}
         keyExtractor={item => `${item.id}`}
         renderItem={renderItem}
+        onPress={item => ModalInfo(item)}
         showsVerticalScrollIndicator={false}
         ListFooterComponent={<View style={{marginBottom: 80}}></View>}
       />
@@ -250,5 +337,40 @@ const Home = ({navigation}) => {
     </SafeAreaView>
   );
 };
-
+const styles = StyleSheet.create({
+  modalBackGround: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: 'white',
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    borderRadius: 20,
+    elevation: 20,
+  },
+  header: {
+    width: '100%',
+    height: 40,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  container: {
+    backgroundColor: '#7CA1B4',
+    height: '100%',
+    flex: 1,
+    alignItems: 'center', // ignore this - we'll come back to it
+    justifyContent: 'center', // ignore this - we'll come back to it
+    flexDirection: 'column',
+  },
+  square: {
+    backgroundColor: '#7cb48f',
+    width: 100,
+    height: 100,
+    margin: 4,
+  },
+});
 export default Home;

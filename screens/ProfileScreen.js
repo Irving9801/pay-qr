@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {View, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
 import {
   Avatar,
@@ -7,30 +7,56 @@ import {
   Text,
   TouchableRipple,
 } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Axios from 'axios';
+import {useDispatch, useSelector} from 'react-redux';
+import { PROFILE_DATA } from '../store/redux/mainReducer';
+const ProfileScreen = ({navigation}) => {
+  const mounted = useRef();
+  const [profile, setProfile] = React.useState();
 
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-import Share from 'react-native-share';
-
-import files from '../assets/filesBase64';
-
-const ProfileScreen = () => {
-  const myCustomShare = async () => {
-    const shareOptions = {
-      message:
-        "Order your next meal from FoodFinder App. I've already ordered more than 10 meals on it.",
-      url: files.appLogo,
-      // urls: [files.image1, files.image2]
-    };
-
-    try {
-      const ShareResponse = await Share.open(shareOptions);
-      console.log(JSON.stringify(ShareResponse));
-    } catch (error) {
-      console.log('Error => ', error);
+  useEffect(() => {
+    if (!mounted.current) {
+      getDataProfile();
+      mounted.current = true;
+    } else {
+      // do componentDidUpdate logic
     }
+  });
+  const showToast = () => {
+    Toast.show({
+      type: 'error',
+      text1: 'Error',
+      text2: 'Ha ocurrido un error 😥',
+    });
   };
-
+  const dispatch = useDispatch();
+  const getDataProfile = async (email, password) => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyY2QyNzQyYmRmZDk0YWQ1ZDY3NWUzMiIsImlhdCI6MTY1NzY3ODQ0MSwiZXhwIjoxNjYwMjcwNDQxfQ.YTBfdMbm9JBmA3X1eqhXGHGkYnSenXrQZzvqQQl0cNM`,
+      },
+    };
+    Axios.get(
+      `https://ws-production-b7ca.up.railway.app/api/users/62cd2742bdfd94ad5d675e32`,
+      config,
+    )
+      .then(response => {
+        const {data} = response;
+        setProfile(data);
+        dispatch({
+          type: PROFILE_DATA,
+          payload: data,
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        showToast();
+      });
+  };
+  console.log(profile);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -51,26 +77,31 @@ const ProfileScreen = () => {
                     marginBottom: 5,
                   },
                 ]}>
-                Irving Vásquez
+                {profile?.name}
               </Title>
-              <Caption style={styles.caption}>@ivasquez</Caption>
+              {/* <Caption style={styles.caption}>@ivasquez</Caption> */}
             </View>
           </View>
         </View>
 
         <View style={styles.userInfoSection}>
           <View style={styles.row}>
-            <Icon name="map-marker-radius" color="#777777" size={20} />
-            <Text style={{color: '#777777', marginLeft: 20}}>Sona, Panama</Text>
+          <Icon name="rocket" size={30} color="#900" />
+            <Text style={{color: '#777777', marginLeft: 20}}>
+              {profile?.company}
+            </Text>
           </View>
           <View style={styles.row}>
             <Icon name="phone" color="#777777" size={20} />
-            <Text style={{color: '#777777', marginLeft: 20}}>67742419</Text>
+            <Text style={{color: '#777777', marginLeft: 20}}>
+              {' '}
+              {profile?.phone}
+            </Text>
           </View>
           <View style={styles.row}>
             <Icon name="email" color="#777777" size={20} />
             <Text style={{color: '#777777', marginLeft: 20}}>
-              irving.vasquez@utp.ac.pa
+              {profile?.email}
             </Text>
           </View>
         </View>
@@ -100,9 +131,13 @@ const ProfileScreen = () => {
               <Text style={styles.menuItemText}>Tarjeta</Text>
             </View>
           </TouchableRipple>
+          <TouchableRipple onPress={() => navigation.navigate("EditInfo")}>
+            <View style={styles.menuItem}>
+              <Text style={styles.menuItemText}>Editar informacion</Text>
+            </View>
+          </TouchableRipple>
           <TouchableRipple onPress={() => {}}>
             <View style={styles.menuItem}>
-              <Icon name="settings-outline" color="#FF6347" size={25} />
               <Text style={styles.menuItemText}>Cerrar sesión</Text>
             </View>
           </TouchableRipple>

@@ -7,6 +7,7 @@ import {getDataPlanReducer} from '../store/redux/shortDataRedux';
 const reducer = combineReducers({
   userReducer: userLoginReducer,
   getPlane: getDataPlanReducer,
+  
 });
 
 const initialState = {

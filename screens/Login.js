@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
@@ -13,30 +13,57 @@ import {
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {user} from 'react-native-vector-icons';
 import Logo from '../assets/images/Logo.png';
 import {useTheme} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
-import {loginAction} from '../store/action/userAction';
-
+import Axios from 'axios';
+import Toast from 'react-native-toast-message';
+import Feather from 'react-native-vector-icons/Feather';
+import {getPlanes} from '../store/action/shortDataAction';
+import {INITAL_DATA_LOGIN} from '../store/redux/mainReducer';
+import {BASE_URL} from './../API';
+import {COLORS} from '../constants';
 const Login = ({navigation}) => {
   const dispatch = useDispatch();
-  const listarMenu = useSelector(state => state.userReducer.userInfo);
-  useEffect(() => {
-    if (listarMenu) {
-      console.log("asDADADASDADAD")
-      navigation.navigate('Profile');
-    }
-  }, [listarMenu]);
   const {height} = useWindowDimensions();
   const [data, setData] = React.useState({
-    username: '',
-    password: '',
     check_textInputChange: false,
     secureTextEntry: true,
     isValidUser: true,
     isValidPassword: true,
   });
+  useEffect(() => {
+    dispatch(getPlanes());
+  }, []);
+  const showToast = () => {
+    Toast.show({
+      type: 'error',
+      text1: 'Error',
+      text2: 'Ha ocurrido un error 😥',
+    });
+  };
+  const handleLogin = async (email, password) => {
+    Axios.post(`${BASE_URL}/api/users/login`, {
+      email,
+      password,
+    })
+      .then(response => {
+        const {data} = response;
+
+        if (data.token) {
+          navigation.navigate('Home');
+        }
+        dispatch({
+          type: INITAL_DATA_LOGIN,
+          payload: data,
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        showToast();
+        navigation.navigate('Home');
+      });
+  };
 
   const {colors} = useTheme();
 
@@ -95,13 +122,9 @@ const Login = ({navigation}) => {
     }
   };
 
-  const loginHandle = (userName, password) => {
-    dispatch(loginAction(userName, password));
-  };
-
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#009387" barStyle="light-content" />
+      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
       <View style={styles.header}>
         <Image
           source={Logo}
@@ -124,12 +147,12 @@ const Login = ({navigation}) => {
               color: colors.text,
             },
           ]}>
-          Username
+          Correo
         </Text>
         <View style={styles.action}>
           <FontAwesome name="user-o" color={colors.text} size={20} />
           <TextInput
-            placeholder="Your Username"
+            placeholder="Ingresa tu correo..."
             placeholderTextColor="#666666"
             style={[
               styles.textInput,
@@ -163,12 +186,12 @@ const Login = ({navigation}) => {
               marginTop: 35,
             },
           ]}>
-          Password
+          Contraseña
         </Text>
         <View style={styles.action}>
           <Feather name="lock" color={colors.text} size={20} />
           <TextInput
-            placeholder="Your Password"
+            placeholder="Ingresa tu contraseña..."
             placeholderTextColor="#666666"
             secureTextEntry={data.secureTextEntry ? true : false}
             style={[
@@ -196,34 +219,29 @@ const Login = ({navigation}) => {
           </Animatable.View>
         )}
 
-        <TouchableOpacity>
-          <Text style={{color: '#009387', marginTop: 15}}>
-            Forgot password?
-          </Text>
-        </TouchableOpacity>
         <View style={styles.button}>
           <TouchableOpacity
             style={styles.signIn}
             onPress={() => {
-              loginHandle(data.username, data.password);
+              handleLogin(data.username, data.password);
             }}>
             <LinearGradient
-              colors={['#08d4c4', '#01ab9d']}
+              colors={[COLORS.secondary, COLORS.primary]}
               style={styles.signIn}>
               <Text
                 style={[
                   styles.textSign,
                   {
-                    color: '#fff',
+                    color: COLORS.white,
                   },
                 ]}>
-                Sign In
+                Inciar sesión
               </Text>
             </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate('SignUpScreen')}
+            onPress={() => navigation.navigate('userOrAdmin')}
             style={[
               styles.signIn,
               {
@@ -239,7 +257,7 @@ const Login = ({navigation}) => {
                   color: '#009387',
                 },
               ]}>
-              Sign Up
+              Registrarse
             </Text>
           </TouchableOpacity>
         </View>
@@ -253,13 +271,14 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#009387',
+    backgroundColor: '#669999',
   },
   header: {
     flex: 1,
     justifyContent: 'flex-end',
     paddingHorizontal: 20,
-    paddingBottom: 50,
+    paddingBottom: 60,
+    paddingTop: 60,
   },
   footer: {
     flex: 3,

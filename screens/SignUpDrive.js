@@ -1,13 +1,11 @@
+import {Formik} from 'formik';
 import React from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   Image,
   TextInput,
-  Modal,
-  FlatList,
   KeyboardAvoidingView,
   ScrollView,
   Platform,
@@ -15,58 +13,18 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import SelectDropdown from 'react-native-select-dropdown';
+import {useDispatch, useSelector} from 'react-redux';
 import Axios from 'axios';
 import Toast from 'react-native-toast-message';
-import {useDispatch, useSelector} from 'react-redux';
-import {Formik} from 'formik';
 import {COLORS, SIZES, FONTS, icons, images} from '../constants';
 import { INITAL_DATA_LOGIN } from '../store/redux/mainReducer';
 
-const SignUp = ({navigation}) => {
+const SignUpChofer = ({navigation}) => {
   const [showPassword, setShowPassword] = React.useState(false);
+  const countries = ['Egypt', 'Canada', 'Australia', 'Ireland'];
+  const [ruta, setRuta] = React.useState();
   const dispatch = useDispatch();
-  const [areas, setAreas] = React.useState([]);
-  const universidades = [
-    'Universidad tecnologica de panama',
-    'Universidad de panama',
-    'Universidad latina',
-  ];
-  const [modalVisible, setModalVisible] = React.useState(false);
-  const [universidad, setUniversity] = React.useState();
-  const showToast = () => {
-    Toast.show({
-      type: 'error',
-      text1: 'Error',
-      text2: 'Ha ocurrido un error 😥',
-    });
-  };
-  const handleRegister = async values => {
-    Axios.post(`https://ws-production-b7ca.up.railway.app/api/users`, {
-      name: values.name,
-      identity: values.identity,
-      phone: values.phone,
-      password: values.password,
-      email: values.email,
-      Ruta: null,
-      company: universidad,
-      typeUser: 'ESTD',
-    })
-      .then(response => {
-        const {data} = response;
-
-        if (data.token) {
-          navigation.navigate('Home');
-        }
-        dispatch({
-          type: INITAL_DATA_LOGIN,
-          payload: data,
-        });
-      })
-      .catch(error => {
-        console.log(error);
-        showToast();
-      });
-  };
+  const [company, setCompany] = React.useState();
 
   function renderHeader() {
     return (
@@ -99,7 +57,40 @@ const SignUp = ({navigation}) => {
       </TouchableOpacity>
     );
   }
+  const showToast = () => {
+    Toast.show({
+      type: 'error',
+      text1: 'Error',
+      text2: 'Ha ocurrido un error 😥',
+    });
+  };
+  const handleRegister = async values => {
+    Axios.post(`https://ws-production-b7ca.up.railway.app/api/users`, {
+      name: values.name,
+      identity: values.identity,
+      phone: values.phone,
+      password: values.password,
+      email: values.email.toLowerCase(),
+      Ruta: ruta,
+      company: company,
+      typeUser: 'CHOFER',
+    })
+      .then(response => {
+        const {data} = response;
 
+        if (data.token) {
+          navigation.navigate('Home');
+        }
+        dispatch({
+          type: INITAL_DATA_LOGIN,
+          payload: data,
+        });
+      })
+      .catch(error => {
+        console.log(error);
+        showToast();
+      });
+  };
   function renderForm() {
     return (
       <Formik
@@ -183,14 +174,37 @@ const SignUp = ({navigation}) => {
             </View>
             <View style={{marginTop: SIZES.padding * 3}}>
               <Text style={{color: COLORS.lightGreen, ...FONTS.body3}}>
-                Universidad
+                Ruta
               </Text>
               <SelectDropdown
                 buttonStyle={styles.dropdown1BtnStyle}
                 buttonTextStyle={styles.dropdown1BtnTxtStyle}
-                data={universidades}
+                data={countries}
                 onSelect={(selectedItem, index) => {
-                  setUniversity(selectedItem);
+                  setRuta(selectedItem);
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  // text represented after item is selected
+                  // if data array is an array of objects then return selectedItem.property to render after item is selected
+                  return selectedItem;
+                }}
+                rowTextForSelection={(item, index) => {
+                  // text represented for each item in dropdown
+                  // if data array is an array of objects then return item.property to represent item in dropdown
+                  return item;
+                }}
+              />
+            </View>
+            <View style={{marginTop: SIZES.padding * 3}}>
+              <Text style={{color: COLORS.lightGreen, ...FONTS.body3}}>
+                Compania
+              </Text>
+              <SelectDropdown
+                buttonStyle={styles.dropdown1BtnStyle}
+                buttonTextStyle={styles.dropdown1BtnTxtStyle}
+                data={countries}
+                onSelect={(selectedItem, index) => {
+                  setCompany(selectedItem);
                 }}
                 buttonTextAfterSelection={(selectedItem, index) => {
                   // text represented after item is selected
@@ -293,57 +307,6 @@ const SignUp = ({navigation}) => {
     );
   }
 
-  function renderAreaCodesModal() {
-    const renderItem = ({item}) => {
-      return (
-        <TouchableOpacity
-          style={{padding: SIZES.padding, flexDirection: 'row'}}
-          onPress={() => {
-            setSelectedArea(item);
-            setModalVisible(false);
-          }}>
-          <Image
-            source={{uri: item.flag}}
-            style={{
-              width: 30,
-              height: 30,
-              marginRight: 10,
-            }}
-          />
-          <Text style={{...FONTS.body4}}>{item.name}</Text>
-        </TouchableOpacity>
-      );
-    };
-
-    return (
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View
-            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <View
-              style={{
-                height: 400,
-                width: SIZES.width * 0.8,
-                backgroundColor: COLORS.lightGreen,
-                borderRadius: SIZES.radius,
-              }}>
-              <FlatList
-                data={areas}
-                renderItem={renderItem}
-                keyExtractor={item => item.code}
-                showsVerticalScrollIndicator={false}
-                style={{
-                  padding: SIZES.padding * 2,
-                  marginBottom: SIZES.padding * 2,
-                }}
-              />
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-    );
-  }
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -354,12 +317,11 @@ const SignUp = ({navigation}) => {
           {renderForm()}
         </ScrollView>
       </LinearGradient>
-      {renderAreaCodesModal()}
     </KeyboardAvoidingView>
   );
 };
 
-export default SignUp;
+export default SignUpChofer;
 const styles = StyleSheet.create({
   dropdown1BtnStyle: {
     width: '100%',
