@@ -1,11 +1,9 @@
 import React from 'react';
 import {
   StyleSheet,
-  Button,
   View,
   SafeAreaView,
   Text,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
 import Lottie from 'lottie-react-native';

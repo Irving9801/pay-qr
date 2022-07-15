@@ -11,18 +11,20 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
+import * as ImagePicker from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import SelectDropdown from 'react-native-select-dropdown';
 import {useDispatch, useSelector} from 'react-redux';
 import Axios from 'axios';
 import Toast from 'react-native-toast-message';
 import {COLORS, SIZES, FONTS, icons, images} from '../constants';
-import { INITAL_DATA_LOGIN } from '../store/redux/mainReducer';
+import {INITAL_DATA_LOGIN} from '../store/redux/mainReducer';
 
 const SignUpChofer = ({navigation}) => {
   const [showPassword, setShowPassword] = React.useState(false);
   const countries = ['Egypt', 'Canada', 'Australia', 'Ireland'];
   const [ruta, setRuta] = React.useState();
+  const [fileUri, setUri] = React.useState(null);
   const dispatch = useDispatch();
   const [company, setCompany] = React.useState();
 
@@ -74,6 +76,7 @@ const SignUpChofer = ({navigation}) => {
       Ruta: ruta,
       company: company,
       typeUser: 'CHOFER',
+      profile:fileUri
     })
       .then(response => {
         const {data} = response;
@@ -90,6 +93,37 @@ const SignUpChofer = ({navigation}) => {
         console.log(error);
         showToast();
       });
+  };
+  const chooseImage = () => {
+    let options = {
+      title: 'Select Image',
+      customButtons: [
+        {name: 'customOptionKey', title: 'Choose Photo from Custom Option'},
+      ],
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    ImagePicker.launchImageLibrary(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+        alert(response.customButton);
+      } else {
+        setUri(response.assets[0].uri);
+      }
+    });
+  };
+  const renderFileUri = () => {
+    if (fileUri) {
+      return <Image source={{uri: fileUri}} style={styles.images} />;
+    } else {
+      return <Text></Text>;
+    }
   };
   function renderForm() {
     return (
@@ -132,7 +166,7 @@ const SignUpChofer = ({navigation}) => {
             </View>
             <View style={{marginTop: SIZES.padding * 3}}>
               <Text style={{color: COLORS.lightGreen, ...FONTS.body3}}>
-                Numero de identificacion
+                Número de identificación
               </Text>
               <TextInput
                 style={{
@@ -143,7 +177,7 @@ const SignUpChofer = ({navigation}) => {
                   color: COLORS.white,
                   ...FONTS.body3,
                 }}
-                placeholder="Introduzca numero de cedula..."
+                placeholder="Introduzca número de cédula..."
                 placeholderTextColor={COLORS.white}
                 selectionColor={COLORS.white}
                 onChangeText={handleChange('identity')}
@@ -153,7 +187,7 @@ const SignUpChofer = ({navigation}) => {
             </View>
             <View style={{marginTop: SIZES.padding * 3}}>
               <Text style={{color: COLORS.lightGreen, ...FONTS.body3}}>
-                Correo electronico
+                Correo electrónico
               </Text>
               <TextInput
                 style={{
@@ -164,7 +198,7 @@ const SignUpChofer = ({navigation}) => {
                   color: COLORS.white,
                   ...FONTS.body3,
                 }}
-                placeholder="Introduzca su correo electronico..."
+                placeholder="Introduzca su correo electrónico..."
                 placeholderTextColor={COLORS.white}
                 selectionColor={COLORS.white}
                 onChangeText={handleChange('email')}
@@ -177,6 +211,7 @@ const SignUpChofer = ({navigation}) => {
                 Ruta
               </Text>
               <SelectDropdown
+                defaultButtonText="Selecciona una ruta"
                 buttonStyle={styles.dropdown1BtnStyle}
                 buttonTextStyle={styles.dropdown1BtnTxtStyle}
                 data={countries}
@@ -197,9 +232,10 @@ const SignUpChofer = ({navigation}) => {
             </View>
             <View style={{marginTop: SIZES.padding * 3}}>
               <Text style={{color: COLORS.lightGreen, ...FONTS.body3}}>
-                Compania
+                Compañías
               </Text>
               <SelectDropdown
+                defaultButtonText="Selecciona una compañía"
                 buttonStyle={styles.dropdown1BtnStyle}
                 buttonTextStyle={styles.dropdown1BtnTxtStyle}
                 data={countries}
@@ -286,19 +322,34 @@ const SignUpChofer = ({navigation}) => {
                 />
               </TouchableOpacity>
             </View>
+            <View style={{marginTop: SIZES.padding * 2}}>
+              <View>{renderFileUri()}</View>
+              <Text style={{color: COLORS.lightGreen, ...FONTS.body3}}>
+                Adjunta tu foto de perfil
+              </Text>
+              <View style={styles.btnParentSection}>
+                <TouchableOpacity
+                  onPress={chooseImage}
+                  style={styles.btnSection}>
+                  <Text style={styles.btnText}>Seleccionar imagen</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
             <View style={{margin: SIZES.padding * 3}}>
-              <TouchableOpacity
-                style={{
-                  height: 60,
-                  backgroundColor: COLORS.black,
-                  borderRadius: SIZES.radius / 1.5,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                onPress={handleSubmit}>
-                <Text style={{color: COLORS.white, ...FONTS.h3}}>
-                  Continuar
-                </Text>
+              <TouchableOpacity style={styles.signIn} onPress={handleSubmit}>
+                <LinearGradient
+                  colors={[COLORS.secondary, COLORS.black]}
+                  style={styles.signIn}>
+                  <Text
+                    style={[
+                      styles.textSign,
+                      {
+                        color: COLORS.white,
+                      },
+                    ]}>
+                    Continuar
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>
@@ -330,6 +381,35 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.white,
+  },
+  images: {
+    width: 150,
+    height: 150,
+    borderColor: 'black',
+    borderWidth: 1,
+    marginHorizontal: 3,
+  },
+  btnText: {
+    textAlign: 'center',
+    color: 'gray',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  btnSection: {
+    width: 225,
+    height: 50,
+    backgroundColor: '#DCDCDC',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 3,
+    marginBottom: 10,
+  },
+  signIn: {
+    width: '100%',
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
   },
   dropdown1BtnTxtStyle: {color: COLORS.white, textAlign: 'left'},
   dropdown1DropdownStyle: {backgroundColor: '#EFEFEF'},

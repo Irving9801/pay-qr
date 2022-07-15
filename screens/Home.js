@@ -1,35 +1,83 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, Modal, StyleSheet, Animated, Button} from 'react-native';
-import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  View,
+  Text,
+  Modal,
+  StyleSheet,
+  Animated,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+import {FlatList} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Image, Circle} from 'react-native-svg';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import Toast from 'react-native-toast-message';
 import {COLORS, FONTS, icons, images, SIZES} from '../constants';
 import {useDispatch, useSelector} from 'react-redux';
-import {getPlanes} from '../store/action/shortDataAction';
-import imgSvg from './x.png';
-import { SELECTED_PLANE } from '../store/redux/mainReducer';
-const Tab = createBottomTabNavigator();
+import Axios from 'axios';
+import Lottie from 'lottie-react-native';
+import {PROFILE_DATA, SELECTED_PLANE} from '../store/redux/mainReducer';
+import LinearGradient from 'react-native-linear-gradient';
 const Home = ({navigation}) => {
+  const mounted = useRef();
   const [visible, setVisible] = React.useState(false);
   const [indexOp, setIndex] = React.useState(0);
   const dispatch = useDispatch();
   const {products, loading} = useSelector(state => state.getPlane?.userGetPlan);
   const {typeUser} = useSelector(state => state.userReducer.userInfo);
+  const {profileData} = useSelector(state => state.getPlane);
+  const {token, _id} = useSelector(state => state.userReducer.userInfo);
+  useEffect(() => {
+    if (!mounted.current) {
+      setTimeout(() => {
+        // getDataProfile();
+      }, 2000);
+
+      mounted.current = true;
+    } else {
+      // do componentDidUpdate logic
+    }
+  });
+  const showToast = () => {
+    Toast.show({
+      type: 'error',
+      text1: 'Error',
+      text2: 'Ha ocurrido un error 😥',
+    });
+  };
+  const getDataProfile = async () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    Axios.get(
+      `https://ws-production-b7ca.up.railway.app/api/users/${_id}`,
+      config,
+    )
+      .then(response => {
+        const {data} = response;
+        dispatch({
+          type: PROFILE_DATA,
+          payload: data,
+        });
+      })
+      
+  };
 
   const featuresData = [
     {
       id: 1,
       icon: icons.reload,
       color: COLORS.purple,
-      backgroundColor: COLORS.lightpurple,
+      backgroundColor: COLORS.lightGreen,
       description: 'Pagar',
     },
     {
       id: 2,
       icon: icons.send,
       color: COLORS.yellow,
-      backgroundColor: COLORS.lightyellow,
+      backgroundColor: COLORS.lightGreen,
       description: 'Movimientos',
     },
     {
@@ -41,16 +89,9 @@ const Home = ({navigation}) => {
     },
     {
       id: 4,
-      icon: icons.wallet,
-      color: COLORS.red,
-      backgroundColor: COLORS.lightRed,
-      description: 'Pagos',
-    },
-    {
-      id: 5,
-      icon: icons.bill,
+      icon: icons.user,
       color: COLORS.yellow,
-      backgroundColor: COLORS.lightyellow,
+      backgroundColor: COLORS.lightGreen,
       description: 'Perfil',
     },
   ];
@@ -63,38 +104,8 @@ const Home = ({navigation}) => {
         <View style={{flex: 1}}>
           <Text style={{...FONTS.h1}}>Bienvenido!</Text>
           <Text style={{...FONTS.body2, color: COLORS.gray}}>
-            Irving Vasquez
+            {profileData?.name}
           </Text>
-        </View>
-
-        <View style={{alignItems: 'center', justifyContent: 'center'}}>
-          <TouchableOpacity
-            style={{
-              height: 40,
-              width: 40,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: COLORS.lightGray,
-            }}>
-            <Image
-              source={icons.bell}
-              style={{
-                width: 20,
-                height: 20,
-                tintColor: COLORS.secondary,
-              }}
-            />
-            <View
-              style={{
-                position: 'absolute',
-                top: -5,
-                right: -5,
-                height: 10,
-                width: 10,
-                backgroundColor: COLORS.red,
-                borderRadius: 5,
-              }}></View>
-          </TouchableOpacity>
         </View>
       </View>
     );
@@ -141,37 +152,40 @@ const Home = ({navigation}) => {
       </View>
     );
     const renderItem = ({item}) => (
-      <TouchableOpacity
-        style={{
-          marginBottom: SIZES.padding * 2,
-          width: 60,
-          alignItems: 'center',
-        }}
-        onPress={() => handlePress(item.description)}>
-        <View
+      console.log(item.icons),
+      (
+        <TouchableOpacity
           style={{
-            height: 50,
-            width: 50,
-            marginBottom: 5,
-            borderRadius: 20,
-            backgroundColor: item.backgroundColor,
+            marginBottom: SIZES.padding * 2,
+            width: 60,
             alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Image
-            source={item.icon}
-            resizeMode="contain"
+          }}
+          onPress={() => handlePress(item.description)}>
+          <View
             style={{
-              height: 20,
-              width: 20,
-              tintColor: item.color,
-            }}
-          />
-        </View>
-        <Text style={{textAlign: 'center', flexWrap: 'wrap', ...FONTS.body4}}>
-          {item.description}
-        </Text>
-      </TouchableOpacity>
+              height: 50,
+              width: 50,
+              marginBottom: 5,
+              borderRadius: 20,
+              backgroundColor: item.backgroundColor,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Image
+              source={item.icon}
+              resizeMode="contain"
+              style={{
+                height: 20,
+                width: 20,
+                tintColor: item.color,
+              }}
+            />
+          </View>
+          <Text style={{textAlign: 'center', flexWrap: 'wrap', ...FONTS.body4}}>
+            {item.description}
+          </Text>
+        </TouchableOpacity>
+      )
     );
 
     return (
@@ -195,6 +209,10 @@ const Home = ({navigation}) => {
       navigation.navigate('Saldo');
     } else if (e === 'Perfil') {
       navigation.navigate('User');
+    } else if (e === 'Movimientos') {
+      navigation.navigate('move');
+    } else if (e === 'Pagar') {
+      navigation.navigate('Scan');
     }
   };
   function renderPromos() {
@@ -230,16 +248,25 @@ const Home = ({navigation}) => {
         <ModalPoup visible={visible}>
           <View style={{alignItems: 'center'}}>
             <View style={styles.header}>
-              <Button
-                title="X"
-                backgroundColor="#96d0e3"
-                color="#E0ECFF"
-                // style={{color: '#E0ECFF', backgroundColor: '#96d0e3'}}
-                onPress={() => setVisible(false)}
-              />
+              <TouchableOpacity onPress={() => setVisible(false)}>
+                <Image
+                  source={icons.close}
+                  style={{
+                    height: 20,
+                    width: 20,
+                    tintColor: item.color,
+                  }}
+                />
+              </TouchableOpacity>
             </View>
           </View>
-
+          <View style={{margin: 0, height: '40%'}}>
+            <Lottie
+              source={require('./../assets/lottie/100548-bus-carga-trackmile.json')}
+              autoPlay
+              loop
+            />
+          </View>
           <Text
             style={{
               textAlign: 'center',
@@ -265,20 +292,32 @@ const Home = ({navigation}) => {
               fontWeight: 'bold',
               height: 60,
             }}>
-            {products[indexOp]?.price}
+            $ {products[indexOp]?.price}
           </Text>
-          <Button
-            title="Comprar"
-            color="#841584"
-            style={{}}
+          <TouchableOpacity
+            style={styles.signIn}
             onPress={e => {
-              navigation.navigate('Payment'),
+              setVisible(false),
+                navigation.navigate('Payment'),
                 dispatch({
                   type: SELECTED_PLANE,
                   payload: products[indexOp]?._id,
                 });
-            }}
-          />
+            }}>
+            <LinearGradient
+              colors={[COLORS.secondary, COLORS.primary]}
+              style={styles.signIn}>
+              <Text
+                style={[
+                  styles.textSign,
+                  {
+                    color: COLORS.white,
+                  },
+                ]}>
+                Comprar
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </ModalPoup>
         <View
           style={{
@@ -289,10 +328,8 @@ const Home = ({navigation}) => {
           }}>
           <Image
             source={images.promoBanner}
-            resizeMode="cover"
             style={{
-              width: '100%',
-              height: '100%',
+              marginLeft: 80,
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
             }}
@@ -357,6 +394,13 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'flex-end',
     justifyContent: 'center',
+  },
+  signIn: {
+    width: '100%',
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
   },
   container: {
     backgroundColor: '#7CA1B4',

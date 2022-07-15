@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 
 import {
   SafeAreaView,
@@ -10,44 +10,40 @@ import {
   Image,
 } from 'react-native';
 import walletimg from './walletimg.png';
-import QRCode from 'react-native-qrcode-svg';
+import Axios from 'axios';
+import {COLORS} from '../constants';
+import { useSelector } from 'react-redux';
 const Saldo = () => {
-  const [inputText, setInputText] = useState('');
-  const [qrvalue, setQrvalue] = useState('');
-  const CRYPTOCURRENCIES = [
-    {
-      id: 1,
-      name: 'Bitcoin',
-      cryptobalance: '3.5290123123 BTC',
-      actualbalance: '$19.53',
-      percentage: '+ 4.32%',
-      difference: '$ 5.44',
-      decreased: false,
-      // imgsrc: bitcoin,
-    },
-    {
-      id: 2,
-      name: 'Etherium',
-      cryptobalance: '12.5290123123 ETH',
-      actualbalance: '$19.53',
-      percentage: '+ 4.32%',
-      decreased: false,
-      difference: '$ 3.44',
-      // imgsrc: etherium,
-    },
-    {
-      id: 3,
-      name: 'Ripple',
-      cryptobalance: '3.5290123123 XRP',
-      actualbalance: '$19.53',
-      percentage: '- 4.32%',
-      decreased: true,
-      difference: '$ 7.44',
-      // imgsrc: ripple,
-    },
-  ];
+  const [saldo, setSaldo] = React.useState();
+  const {token,_id} = useSelector(state => state.userReducer.userInfo);
+  const mounted = useRef();
+  useEffect(() => {
+    if (!mounted.current) {
+      getDataProfile();
+      mounted.current = true;
+    } else {
+      // do componentDidUpdate logic
+    }
+  });
+
+  const getDataProfile = async () => {
+    Axios.get(
+      `https://ws-production-b7ca.up.railway.app/api/buy/${_id}`,
+    )
+      .then(response => {
+        const {data} = response;
+        setSaldo(data[0]);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+  console.log(saldo);
   return (
     <View style={{height: '100%', backgroundColor: '#F5F8FF'}}>
+      <View style={styles.headerbar}>
+        <Text style={{fontSize: 25, fontWeight: '500'}}>Saldo</Text>
+      </View>
       <View style={{marginHorizontal: 20}}>
         <View style={styles.container2}>
           <View style={styles.container}>
@@ -59,6 +55,7 @@ const Saldo = () => {
               }}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Image
+                  color={COLORS.primary}
                   style={{height: 40, width: 40}}
                   source={walletimg}></Image>
                 <Text style={{color: '', fontWeight: 'bold', marginLeft: 10}}>
@@ -66,8 +63,7 @@ const Saldo = () => {
                 </Text>
               </View>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{color: '#ADB7C3'}}>USD</Text>
-                {/* <Ionicons name="chevron-down-outline" size={20} color=""  /> */}
+                <Text style={{color: COLORS.primary}}>USD</Text>
               </View>
             </View>
             <View
@@ -77,23 +73,11 @@ const Saldo = () => {
                 justifyContent: 'space-between',
               }}>
               <Text style={{fontSize: 30, marginLeft: 5, color: '#ADB7C3'}}>
-                $33.212
+                ${saldo?.Saldo}
               </Text>
-              <View
-                style={{
-                  borderRadius: 20,
-                  backgroundColor: '',
-                  height: 25,
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                }}>
-                <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 12}}>
-                  + 3.55%
-                </Text>
-              </View>
             </View>
             <Text style={{marginTop: 5, color: '', fontSize: 20}}>
-              7.2131231
+              {saldo?.namePlane}
             </Text>
           </View>
         </View>
@@ -131,5 +115,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 25,
     paddingTop: 20,
+  },
+  headerbar: {
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
 });

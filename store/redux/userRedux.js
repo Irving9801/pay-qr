@@ -20,6 +20,10 @@ export const userLoginReducer = (state = initialState, action) =>
     case INITAL_HIDE_LOGIN:
       draft.loading=false;
       break;
+    case 'DELETE':
+      draft.loading=false;
+      draft.userInfo=[];
+      break
     default:
       return state;
   }

@@ -13,7 +13,7 @@ export const COLORS = {
   lime: '#669999',
   emerald: '#669999',
 
-  red: '#FF4134',
+  red: '#FF9065',
   lightRed: '#FFF1F0',
 
   purple: '#6B3CE9',

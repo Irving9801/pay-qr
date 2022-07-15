@@ -9,7 +9,7 @@
 import React, {useEffect} from 'react';
 import {SignUp, Login} from './screens';
 import {createStackNavigator} from '@react-navigation/stack';
-import {StyleSheet} from 'react-native';
+import {StyleSheet,LogBox} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import Tabs from './navigation/tabs';
 import {Provider} from 'react-redux';
@@ -20,7 +20,9 @@ import UserOrAdmin from './screens/UserOrAdmin';
 import Toast from 'react-native-toast-message';
 import PaymentScreenMain from './screens/PaymentScreen';
 import SignUpChofer from './screens/SignUpDrive';
+import Scan from './screens/Scan';
 import EditInfo from './screens/EditInfo';
+import Movent from './screens/movimientos';
 import {StripeProvider} from '@stripe/stripe-react-native';
 
 const Stack = createStackNavigator();
@@ -40,14 +42,16 @@ const App = () => {
               }}
               initialRouteName={'Login'}>
               <Stack.Screen name="Registerone" component={SignUp} />
-              <Stack.Screen name="EditInfo" component={EditInfo}/>
+              <Stack.Screen name="EditInfo" component={EditInfo} />
               <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="Scan" component={Scan} />
               <Stack.Screen name="Home" component={Tabs} />
               <Stack.Screen name="Saldo" component={Saldo} />
               <Stack.Screen name="User" component={ProfileScreen} />
               <Stack.Screen name="Payment" component={PaymentScreenMain} />
               <Stack.Screen name="userOrAdmin" component={UserOrAdmin} />
               <Stack.Screen name="Registertwo" component={SignUpChofer} />
+              <Stack.Screen name="move" component={Movent} />
             </Stack.Navigator>
           </NavigationContainer>
         </StripeProvider>

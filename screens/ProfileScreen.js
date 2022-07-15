@@ -11,19 +11,27 @@ import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Axios from 'axios';
 import {useDispatch, useSelector} from 'react-redux';
-import { PROFILE_DATA } from '../store/redux/mainReducer';
+import { PROFILE_DATA} from '../store/redux/mainReducer';
+import {COLORS} from '../constants';
 const ProfileScreen = ({navigation}) => {
   const mounted = useRef();
   const [profile, setProfile] = React.useState();
+  const [saldo, setSaldo] = React.useState();
+  const {token, _id} = useSelector(state => state.userReducer.userInfo);
 
   useEffect(() => {
     if (!mounted.current) {
       getDataProfile();
+      getDataBuy();
       mounted.current = true;
     } else {
       // do componentDidUpdate logic
     }
   });
+  const reset = () => {
+    dispatch({type: "DELETE"});
+    navigation.navigate('Login');
+  };
   const showToast = () => {
     Toast.show({
       type: 'error',
@@ -32,15 +40,26 @@ const ProfileScreen = ({navigation}) => {
     });
   };
   const dispatch = useDispatch();
+  const getDataBuy = async () => {
+    Axios.get(`https://ws-production-b7ca.up.railway.app/api/buy/${_id}`)
+      .then(response => {
+        const {data} = response;
+        setSaldo(data[0]);
+      })
+      .catch(error => {
+        console.error(error);
+        showToast();
+      });
+  };
   const getDataProfile = async (email, password) => {
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyY2QyNzQyYmRmZDk0YWQ1ZDY3NWUzMiIsImlhdCI6MTY1NzY3ODQ0MSwiZXhwIjoxNjYwMjcwNDQxfQ.YTBfdMbm9JBmA3X1eqhXGHGkYnSenXrQZzvqQQl0cNM`,
+        Authorization: `Bearer ${token}`,
       },
     };
     Axios.get(
-      `https://ws-production-b7ca.up.railway.app/api/users/62cd2742bdfd94ad5d675e32`,
+      `https://ws-production-b7ca.up.railway.app/api/users/${_id}`,
       config,
     )
       .then(response => {
@@ -57,6 +76,7 @@ const ProfileScreen = ({navigation}) => {
       });
   };
   console.log(profile);
+  console.log(saldo);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -86,20 +106,20 @@ const ProfileScreen = ({navigation}) => {
 
         <View style={styles.userInfoSection}>
           <View style={styles.row}>
-          <Icon name="rocket" size={30} color="#900" />
+            <Icon name="university" size={20} color={COLORS.primary} />
             <Text style={{color: '#777777', marginLeft: 20}}>
               {profile?.company}
             </Text>
           </View>
           <View style={styles.row}>
-            <Icon name="phone" color="#777777" size={20} />
+            <Icon name="phone" size={20} color={COLORS.primary} />
             <Text style={{color: '#777777', marginLeft: 20}}>
               {' '}
               {profile?.phone}
             </Text>
           </View>
           <View style={styles.row}>
-            <Icon name="email" color="#777777" size={20} />
+            <Icon name="mail-forward" size={20} color={COLORS.primary} />
             <Text style={{color: '#777777', marginLeft: 20}}>
               {profile?.email}
             </Text>
@@ -115,29 +135,25 @@ const ProfileScreen = ({navigation}) => {
                 borderRightWidth: 1,
               },
             ]}>
-            <Title>15$</Title>
-            <Caption>Wallet</Caption>
+            <Title>${saldo?.Saldo}</Title>
+            <Caption>Mi saldo</Caption>
           </View>
           <View style={styles.infoBox}>
-            <Title>12</Title>
-            <Caption>Orders</Caption>
+            <Title> {saldo?.namePlane}</Title>
+            <Caption>Plan</Caption>
           </View>
         </View>
 
         <View style={styles.menuWrapper}>
-          <TouchableRipple onPress={() => {}}>
+          <TouchableRipple onPress={() => navigation.navigate('EditInfo')}>
             <View style={styles.menuItem}>
-              <Icon name="credit-card" color="#FF6347" size={25} />
-              <Text style={styles.menuItemText}>Tarjeta</Text>
-            </View>
-          </TouchableRipple>
-          <TouchableRipple onPress={() => navigation.navigate("EditInfo")}>
-            <View style={styles.menuItem}>
+              <Icon name="edit" size={25} />
               <Text style={styles.menuItemText}>Editar informacion</Text>
             </View>
           </TouchableRipple>
-          <TouchableRipple onPress={() => {}}>
+          <TouchableRipple onPress={reset}>
             <View style={styles.menuItem}>
+              <Icon name="window-close-o" size={25} />
               <Text style={styles.menuItemText}>Cerrar sesión</Text>
             </View>
           </TouchableRipple>

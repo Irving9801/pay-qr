@@ -111,7 +111,7 @@ const Tabs = () => {
       }}
       tabBar={props => <CustomTabBar props={props} />}>
       <Tab.Screen
-        name="Home"
+        name="Inicio"
         component={Home}
         options={{
           tabBarIcon: ({focused}) => (
@@ -130,7 +130,7 @@ const Tabs = () => {
       />
 
       <Tab.Screen
-        name="Scan"
+        name="Pagar"
         component={Scan}
         options={{
           tabBarIcon: ({focused}) => (
@@ -147,9 +147,8 @@ const Tabs = () => {
           tabBarButton: props => <TabBarCustomButton {...props} />,
         }}
       />
-
       <Tab.Screen
-        name="User"
+        name="Perfil"
         component={ProfileScreen}
         options={{
           tabBarIcon: ({focused}) => (

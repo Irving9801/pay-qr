@@ -8,3 +8,4 @@ export const INITALGET_HIDE_PLAN = 'INITALGET_HIDE_PLAN';
 
 export const PROFILE_DATA = 'PROFILE_DATA';
 export const SELECTED_PLANE = 'SELECTED_PLANE';
+export const DELETE = 'DELETE';
