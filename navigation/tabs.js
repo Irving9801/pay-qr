@@ -10,6 +10,7 @@ import {isIphoneX} from 'react-native-iphone-x-helper';
 import {COLORS, icons} from '../constants';
 import {Home, Scan} from '../screens';
 import ProfileScreen from '../screens/ProfileScreen';
+import {useSelector} from 'react-redux';
 const Tab = createBottomTabNavigator();
 
 const CustomTabBar = props => {
@@ -32,6 +33,7 @@ const CustomTabBar = props => {
     return <BottomTabBar {...props.props} />;
   }
 };
+
 const TabBarCustomButton = ({
   accessibilityLabel,
   accessibilityState,
@@ -39,7 +41,6 @@ const TabBarCustomButton = ({
   onPress,
 }) => {
   var isSelected = accessibilityState.selected;
-
   if (isSelected) {
     return (
       <View style={{flex: 1, alignItems: 'center'}}>
@@ -95,7 +96,8 @@ const TabBarCustomButton = ({
   }
 };
 
-const Tabs = () => {
+const Tabs = (props) => {
+  const {typeUser} = useSelector(state => state.userReducer.userInfo);
   return (
     <Tab.Navigator
       tabBarOptions={{
@@ -128,25 +130,27 @@ const Tabs = () => {
           tabBarButton: props => <TabBarCustomButton {...props} />,
         }}
       />
+      {typeUser !== 'ADMIN' ? (
+        <Tab.Screen
+          name="Pagar"
+          component={Scan}
+          options={{
+            tabBarIcon: ({focused}) => (
+              <Image
+                source={icons.scan}
+                resizeMode="contain"
+                style={{
+                  width: 25,
+                  height: 25,
+                  tintColor: focused ? COLORS.white : COLORS.secondary,
+                }}
+              />
+            ),
+            tabBarButton: props => <TabBarCustomButton {...props} />,
+          }}
+        />
+       ) : null} 
 
-      <Tab.Screen
-        name="Pagar"
-        component={Scan}
-        options={{
-          tabBarIcon: ({focused}) => (
-            <Image
-              source={icons.scan}
-              resizeMode="contain"
-              style={{
-                width: 25,
-                height: 25,
-                tintColor: focused ? COLORS.white : COLORS.secondary,
-              }}
-            />
-          ),
-          tabBarButton: props => <TabBarCustomButton {...props} />,
-        }}
-      />
       <Tab.Screen
         name="Perfil"
         component={ProfileScreen}

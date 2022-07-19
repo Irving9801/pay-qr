@@ -1,5 +1,5 @@
 import {Formik} from 'formik';
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -27,7 +27,49 @@ const SignUpChofer = ({navigation}) => {
   const [fileUri, setUri] = React.useState(null);
   const dispatch = useDispatch();
   const [company, setCompany] = React.useState();
-
+  const [companys, setCompanys] = React.useState();
+  const [rutas, setRutas] = React.useState();
+  console.log(rutas, companys);
+  const mounted = useRef();
+  useEffect(() => {
+    if (!mounted.current) {
+      getDataRutas();
+      getCompany();
+      mounted.current = true;
+    } else {
+      // do componentDidUpdate logic
+    }
+  });
+  const getDataRutas = async () => {
+    Axios.get(`https://ws-production-b7ca.up.railway.app/api/ruta`)
+      .then(response => {
+        const {data} = response;
+        let results = [];
+        for (var i = 0; i < data.products.length; i++) {
+          results[[i]] = data.products[i].nameRuta;
+        }
+        setRutas(results);
+      })
+      .catch(error => {
+        console.error(error);
+        // showToast();
+      });
+  };
+  const getCompany = async () => {
+    Axios.get(`https://ws-production-b7ca.up.railway.app/api/company`)
+      .then(response => {
+        const {data} = response;
+        let results = [];
+        for (var i = 0; i < data.products.length; i++) {
+          results[[i]] = data.products[i].name;
+        }
+        setCompanys(results);
+      })
+      .catch(error => {
+        console.error(error);
+        // showToast();
+      });
+  };
   function renderHeader() {
     return (
       <TouchableOpacity
@@ -76,7 +118,7 @@ const SignUpChofer = ({navigation}) => {
       Ruta: ruta,
       company: company,
       typeUser: 'CHOFER',
-      profile:fileUri
+      profile: fileUri,
     })
       .then(response => {
         const {data} = response;
@@ -90,7 +132,6 @@ const SignUpChofer = ({navigation}) => {
         });
       })
       .catch(error => {
-        console.log(error);
         showToast();
       });
   };
@@ -214,7 +255,7 @@ const SignUpChofer = ({navigation}) => {
                 defaultButtonText="Selecciona una ruta"
                 buttonStyle={styles.dropdown1BtnStyle}
                 buttonTextStyle={styles.dropdown1BtnTxtStyle}
-                data={countries}
+                data={rutas}
                 onSelect={(selectedItem, index) => {
                   setRuta(selectedItem);
                 }}
@@ -238,7 +279,7 @@ const SignUpChofer = ({navigation}) => {
                 defaultButtonText="Selecciona una compañía"
                 buttonStyle={styles.dropdown1BtnStyle}
                 buttonTextStyle={styles.dropdown1BtnTxtStyle}
-                data={countries}
+                data={companys}
                 onSelect={(selectedItem, index) => {
                   setCompany(selectedItem);
                 }}

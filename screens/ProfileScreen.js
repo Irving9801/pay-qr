@@ -75,8 +75,6 @@ const ProfileScreen = ({navigation}) => {
         showToast();
       });
   };
-  console.log(profile);
-  console.log(saldo);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>

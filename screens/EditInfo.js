@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {
   View,
@@ -18,7 +18,29 @@ import {COLORS, SIZES, FONTS} from '../constants';
 import {INITAL_DATA_LOGIN} from '../store/redux/mainReducer';
 const EditInfo = ({navigation}) => {
   const dispatch = useDispatch();
-  const [qrvalue, setQrvalue] = useState('');
+  const [areas, setAreas] = React.useState([]);
+  const mounted = useRef();
+  useEffect(() => {
+    if (!mounted.current) {
+      getU();
+      mounted.current = true;
+    }
+  });
+  const getU = async () => {
+    Axios.get(`https://ws-production-b7ca.up.railway.app/api/university`)
+      .then(response => {
+        const {data} = response;
+
+        let results = [];
+        for (var i = 0; i < data.products.length; i++) {
+          results[[i]] = data.products[i].name;
+        }
+        setAreas(results);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
   const [fileUri, setUri] = React.useState(null);
   const [fileUriPerfil, setUriPerfil] = React.useState(null);
   const {profileData} = useSelector(state => state.getPlane);
@@ -228,9 +250,10 @@ const EditInfo = ({navigation}) => {
                 Universidad
               </Text>
               <SelectDropdown
+              defaultButtonText="Selecciona una universidad"
                 buttonStyle={styles.dropdown1BtnStyle}
                 buttonTextStyle={styles.dropdown1BtnTxtStyle}
-                data={universidades}
+                data={areas}
                 defaultValue={profileData.company}
                 onSelect={(selectedItem, index) => {
                   setUniversity(selectedItem);

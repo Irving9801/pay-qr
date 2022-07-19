@@ -61,7 +61,6 @@ const Login = ({navigation}) => {
       .catch(error => {
         console.error(error);
         showToast();
-        // navigation.navigate('Home');
       });
   };
 

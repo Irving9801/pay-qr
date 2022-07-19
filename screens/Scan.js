@@ -38,20 +38,14 @@ const Scan = () => {
       getDataRutas();
       getDataProfile();
       mounted.current = true;
-    } else {
-      // do componentDidUpdate logic
     }
   });
-  console.log(price, 'price');
-  console.log(index, 'university');
+
   const [move, setMove] = React.useState();
   const getDataProfile = async () => {
-    Axios.get(
-      `https://ws-production-b7ca.up.railway.app/api/buy/${scandata[2]}`,
-    )
+    Axios.get(`https://ws-production-b7ca.up.railway.app/api/buy/${_id}`)
       .then(response => {
         const {data} = response;
-        console.log(data, 'nazaret');
         setMove(data[0]);
       })
       .catch(error => {
@@ -85,7 +79,7 @@ const Scan = () => {
       {
         prec: price[index],
         idUser: _id,
-        buy: move._id,
+        buy: move?._id,
       },
     ];
     setQr(payload);
@@ -98,13 +92,11 @@ const Scan = () => {
         Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyY2QyNzQyYmRmZDk0YWQ1ZDY3NWUzMiIsImlhdCI6MTY1NzY3ODQ0MSwiZXhwIjoxNjYwMjcwNDQxfQ.YTBfdMbm9JBmA3X1eqhXGHGkYnSenXrQZzvqQQl0cNM`,
       },
     };
-    console.log(scandata[1]);
     Axios.get(
       `https://ws-production-b7ca.up.railway.app/api/buy/${scandata[1]}`,
     )
       .then(response => {
         const {data} = response;
-        console.log(data, 'nazaret');
         setMove(data[0]);
 
         Axios.put(
@@ -152,7 +144,7 @@ const Scan = () => {
     let arr = e.data.split(',');
     setScan(arr);
   };
-  console.log(scandata, '!!!!!!!!!!!!');
+
   function renderPaymentMethods() {
     return (
       <View
@@ -167,7 +159,10 @@ const Scan = () => {
           borderTopRightRadius: SIZES.radius,
           backgroundColor: COLORS.white,
         }}>
-        <Text style={{...FONTS.h4}}>Detalle</Text>
+        <Text style={{...FONTS.h3}}>Detalle</Text>
+        <Text style={styles.centerText}>
+          Monto a pagar por el usuario: ${scandata ? scandata[0] : null}
+        </Text>
         <View
           style={{
             flex: 1,
@@ -175,24 +170,30 @@ const Scan = () => {
             alignItems: 'flex-start',
             marginTop: SIZES.padding * 2,
           }}>
-          <Text>{scandata}</Text>
-          <View>
-            <TouchableOpacity style={styles.signIn} onPress={createTrans}>
-              <LinearGradient
-                colors={[COLORS.secondary, COLORS.primary]}
-                style={styles.signIn}>
-                <Text
-                  style={[
-                    styles.textSign,
-                    {
-                      color: COLORS.white,
-                    },
-                  ]}>
-                  Realizar cobro
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={{
+              width: '100%',
+              height: 50,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 10,
+              marginTop: 20,
+            }}
+            onPress={createTrans}>
+            <LinearGradient
+              colors={[COLORS.secondary, COLORS.primary]}
+              style={styles.signIn}>
+              <Text
+                style={[
+                  styles.textSign,
+                  {
+                    color: COLORS.white,
+                  },
+                ]}>
+                Realizar cobro
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -245,9 +246,9 @@ const Scan = () => {
             flashMode={RNCamera.Constants.FlashMode.torch}
             topContent={
               <Text style={styles.centerText}>
-                Go to{' '}
-                <Text style={styles.textBold}>wikipedia.org/wiki/QR_code</Text>{' '}
-                on your computer and scan the QR code.
+               
+                <Text style={styles.textBold}></Text>
+              
               </Text>
             }
             bottomContent={

@@ -6,10 +6,10 @@
  * @flow strict-local
  */
 
-import React, {useEffect} from 'react';
+import React from 'react';
 import {SignUp, Login} from './screens';
 import {createStackNavigator} from '@react-navigation/stack';
-import {StyleSheet,LogBox} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import Tabs from './navigation/tabs';
 import {Provider} from 'react-redux';
@@ -23,8 +23,11 @@ import SignUpChofer from './screens/SignUpDrive';
 import Scan from './screens/Scan';
 import EditInfo from './screens/EditInfo';
 import Movent from './screens/movimientos';
+import add from './screens/add';
+import addRoute from './screens/addRoute';
 import {StripeProvider} from '@stripe/stripe-react-native';
-
+import AddU from './screens/addU';
+import AddCompany from './screens/addCompa';
 const Stack = createStackNavigator();
 const App = () => {
   const publishableKey =
@@ -44,6 +47,7 @@ const App = () => {
               <Stack.Screen name="Registerone" component={SignUp} />
               <Stack.Screen name="EditInfo" component={EditInfo} />
               <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="addU" component={AddU} />
               <Stack.Screen name="Scan" component={Scan} />
               <Stack.Screen name="Home" component={Tabs} />
               <Stack.Screen name="Saldo" component={Saldo} />
@@ -52,6 +56,9 @@ const App = () => {
               <Stack.Screen name="userOrAdmin" component={UserOrAdmin} />
               <Stack.Screen name="Registertwo" component={SignUpChofer} />
               <Stack.Screen name="move" component={Movent} />
+              <Stack.Screen name="add" component={add} />
+              <Stack.Screen name="company" component={AddCompany} />
+              <Stack.Screen name="rutas" component={addRoute} />
             </Stack.Navigator>
           </NavigationContainer>
         </StripeProvider>

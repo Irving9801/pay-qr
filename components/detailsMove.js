@@ -1,10 +1,13 @@
 import * as React from 'react';
 import {View, StyleSheet, Image, Text, Pressable} from 'react-native';
+import {useSelector} from 'react-redux';
 import {COLORS, icons} from '../constants';
 import {CustomCard} from './CustomCard';
 
 export const DetailsMove = props => {
-  console.log('Details', props);
+  const {token, _id, typeUser} = useSelector(
+    state => state.userReducer.userInfo,
+  );
   let {pago, createdAt, actualbalance, decreased, saldo, difference, imgsrc} =
     props.item;
 
@@ -38,18 +41,26 @@ export const DetailsMove = props => {
             <Text style={{color: COLORS.primary, fontWeight: '600'}}>
               {createdAt}
             </Text>
-            <Text
-              style={{
-                color: decreased ? COLORS.primary : COLORS.primary,
-                fontWeight: '600',
-              }}>
-              ${saldo}
-            </Text>
+            {typeUser === 'ESTD' ? (
+              <Text
+                style={{
+                  color: COLORS.red,
+                  fontWeight: '600',
+                }}>
+                Pagos
+              </Text>
+            ) : (
+              <Text
+                style={{
+                  color: COLORS.green,
+                  fontWeight: '600',
+                }}>
+                Cobros
+              </Text>
+            )}
           </View>
         </View>
       </CustomCard>
     </Pressable>
   );
 };
-
-const styles = StyleSheet.create({});

@@ -1,11 +1,13 @@
 import React, {useEffect, useRef} from 'react';
-import {StyleSheet, View, Text, FlatList, Dimensions} from 'react-native';
+import {StyleSheet, View, Text, FlatList} from 'react-native';
 import {DetailsMove} from '../components/detailsMove';
 import Axios from 'axios';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 const Movimientos = () => {
   const mounted = useRef();
-  const {token,_id} = useSelector(state => state.userReducer.userInfo);
+  const {token, _id, typeUser} = useSelector(
+    state => state.userReducer.userInfo,
+  );
   useEffect(() => {
     if (!mounted.current) {
       getDataProfile();
@@ -15,17 +17,28 @@ const Movimientos = () => {
     }
   });
   const [move, setMove] = React.useState();
-  //   http://localhost:5000/api/trans
   const getDataProfile = async () => {
-    Axios.get(`https://ws-production-b7ca.up.railway.app/api/trans/${_id}`)
-      .then(response => {
-        const {data} = response;
-        console.log(data,"MAMA");
-        setMove(data);
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    if (typeUser === 'ESTD') {
+      Axios.get(`https://ws-production-b7ca.up.railway.app/api/trans/${_id}`)
+        .then(response => {
+          const {data} = response;
+          setMove(data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    } else {
+      Axios.get(
+        `https://ws-production-b7ca.up.railway.app/api/trans/rut/${_id}`,
+      )
+        .then(response => {
+          const {data} = response;
+          setMove(data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
   };
   return (
     <View style={{height: '100%', backgroundColor: '#F5F8FF'}}>
@@ -42,7 +55,7 @@ const Movimientos = () => {
           }}>
           <FlatList
             data={move}
-            style={{height: Dimensions.get('window').height / 2 - 0}}
+            style={{height: '100%'}}
             ItemSeparatorComponent={() => (
               <View style={{marginVertical: 8}}></View>
             )}

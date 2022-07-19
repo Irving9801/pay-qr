@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -34,7 +34,28 @@ const SignUp = ({navigation}) => {
     'Universidad de panama',
     'Universidad latina',
   ];
-  
+  const mounted = useRef();
+  useEffect(() => {
+    if (!mounted.current) {
+      getU();
+      mounted.current = true;
+    }
+  });
+  const getU = async () => {
+    Axios.get(`https://ws-production-b7ca.up.railway.app/api/university`)
+      .then(response => {
+        const {data} = response;
+
+        let results = [];
+        for (var i = 0; i < data.products.length; i++) {
+          results[[i]] = data.products[i].name;
+        }
+        setAreas(results);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
   const [modalVisible, setModalVisible] = React.useState(false);
   const [universidad, setUniversity] = React.useState();
   const showToast = () => {
@@ -258,7 +279,7 @@ const SignUp = ({navigation}) => {
                 defaultButtonText="Selecciona una universidad"
                 buttonStyle={styles.dropdown1BtnStyle}
                 buttonTextStyle={styles.dropdown1BtnTxtStyle}
-                data={universidades}
+                data={areas}
                 onSelect={(selectedItem, index) => {
                   setUniversity(selectedItem);
                 }}
@@ -392,57 +413,6 @@ const SignUp = ({navigation}) => {
     );
   }
 
-  function renderAreaCodesModal() {
-    const renderItem = ({item}) => {
-      return (
-        <TouchableOpacity
-          style={{padding: SIZES.padding, flexDirection: 'row'}}
-          onPress={() => {
-            setSelectedArea(item);
-            setModalVisible(false);
-          }}>
-          <Image
-            source={{uri: item.flag}}
-            style={{
-              width: 30,
-              height: 30,
-              marginRight: 10,
-            }}
-          />
-          <Text style={{...FONTS.body4}}>{item.name}</Text>
-        </TouchableOpacity>
-      );
-    };
-
-    return (
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View
-            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <View
-              style={{
-                height: 400,
-                width: SIZES.width * 0.8,
-                backgroundColor: COLORS.lightGreen,
-                borderRadius: SIZES.radius,
-              }}>
-              <FlatList
-                data={areas}
-                renderItem={renderItem}
-                keyExtractor={item => item.code}
-                showsVerticalScrollIndicator={false}
-                style={{
-                  padding: SIZES.padding * 2,
-                  marginBottom: SIZES.padding * 2,
-                }}
-              />
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-    );
-  }
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -453,7 +423,6 @@ const SignUp = ({navigation}) => {
           {renderForm()}
         </ScrollView>
       </LinearGradient>
-      {renderAreaCodesModal()}
     </KeyboardAvoidingView>
   );
 };

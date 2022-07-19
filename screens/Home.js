@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -8,24 +8,51 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {FlatList} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 import {COLORS, FONTS, icons, images, SIZES} from '../constants';
 import {useDispatch, useSelector} from 'react-redux';
-import Axios from 'axios';
 import Lottie from 'lottie-react-native';
-import {PROFILE_DATA, SELECTED_PLANE} from '../store/redux/mainReducer';
+import {SELECTED_PLANE} from '../store/redux/mainReducer';
 import LinearGradient from 'react-native-linear-gradient';
+import BoxItemTopProduct from '../components/BoxItemTopProduct';
 const Home = ({navigation}) => {
   const mounted = useRef();
   const [visible, setVisible] = React.useState(false);
   const [indexOp, setIndex] = React.useState(0);
   const dispatch = useDispatch();
-  const {products, loading} = useSelector(state => state.getPlane?.userGetPlan);
+  const {products} = useSelector(state => state.getPlane?.userGetPlan);
   const {typeUser} = useSelector(state => state.userReducer.userInfo);
   const {profileData} = useSelector(state => state.getPlane);
-  const {token, _id} = useSelector(state => state.userReducer.userInfo);
+  const dataTopProducts = [
+    {
+      name: 'RUTA',
+      bgColor: 'rgba(227,206,243,0.5)',
+      price: 1.53,
+      desc: 'rutas',
+      icon: <Icon name="university" size={20} color={COLORS.primary} />,
+    },
+    {
+      name: 'UNIVERSIDAD',
+      bgColor: 'rgba(255, 234, 232, 0.5)',
+      price: 1.53,
+      desc: 'addU',
+      icon: <Icon name="university" size={20} color={COLORS.primary} />,
+    },
+    {
+      name: 'PLANES',
+      bgColor: 'rgba(187, 208, 136, 0.5)',
+      price: 1.53,
+      desc: 'add',
+    },
+    {
+      name: 'COMPAÑIA',
+      bgColor: 'rgba(187, 208, 136, 0.5)',
+      price: 1.53,
+      desc: 'company',
+    },
+  ];
   useEffect(() => {
     if (!mounted.current) {
       setTimeout(() => {
@@ -37,35 +64,31 @@ const Home = ({navigation}) => {
       // do componentDidUpdate logic
     }
   });
-  const showToast = () => {
-    Toast.show({
-      type: 'error',
-      text1: 'Error',
-      text2: 'Ha ocurrido un error 😥',
-    });
-  };
-  const getDataProfile = async () => {
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    Axios.get(
-      `https://ws-production-b7ca.up.railway.app/api/users/${_id}`,
-      config,
-    )
-      .then(response => {
-        const {data} = response;
-        dispatch({
-          type: PROFILE_DATA,
-          payload: data,
-        });
-      })
-      
-  };
 
   const featuresData = [
+    {
+      id: 2,
+      icon: icons.send,
+      color: COLORS.yellow,
+      backgroundColor: COLORS.lightGreen,
+      description: 'Movimientos',
+    },
+    {
+      id: 3,
+      icon: icons.internet,
+      color: COLORS.primary,
+      backgroundColor: COLORS.lightGreen,
+      description: 'Saldo',
+    },
+    {
+      id: 4,
+      icon: icons.user,
+      color: COLORS.yellow,
+      backgroundColor: COLORS.lightGreen,
+      description: 'Perfil',
+    },
+  ];
+  const featuresData1 = [
     {
       id: 1,
       icon: icons.reload,
@@ -96,8 +119,8 @@ const Home = ({navigation}) => {
     },
   ];
 
-  const [features, setFeatures] = React.useState(featuresData);
   const [specialPromos, setSpecialPromos] = React.useState(products);
+
   function renderHeader() {
     return (
       <View style={{flexDirection: 'row', marginVertical: SIZES.padding * 2}}>
@@ -152,7 +175,6 @@ const Home = ({navigation}) => {
       </View>
     );
     const renderItem = ({item}) => (
-      console.log(item.icons),
       (
         <TouchableOpacity
           style={{
@@ -189,18 +211,35 @@ const Home = ({navigation}) => {
     );
 
     return (
-      <FlatList
-        ListHeaderComponent={Header}
-        data={features}
-        numColumns={4}
-        columnWrapperStyle={{justifyContent: 'space-between'}}
-        keyExtractor={item => `${item._id}`}
-        renderItem={renderItem}
-        style={{marginTop: SIZES.padding * 2}}
-        onPress={e => {
-          handlePress(e);
-        }}
-      />
+      <>
+        {typeUser === 'CHOFER' ? (
+          <FlatList
+            ListHeaderComponent={Header}
+            data={featuresData}
+            numColumns={4}
+            columnWrapperStyle={{justifyContent: 'space-between'}}
+            keyExtractor={item => `${item._id}`}
+            renderItem={renderItem}
+            style={{marginTop: SIZES.padding * 2}}
+            onPress={e => {
+              handlePress(e);
+            }}
+          />
+        ) : (
+          <FlatList
+            ListHeaderComponent={Header}
+            data={featuresData1}
+            numColumns={4}
+            columnWrapperStyle={{justifyContent: 'space-between'}}
+            keyExtractor={item => `${item._id}`}
+            renderItem={renderItem}
+            style={{marginTop: SIZES.padding * 2}}
+            onPress={e => {
+              handlePress(e);
+            }}
+          />
+        )}
+      </>
     );
   }
 
@@ -220,7 +259,7 @@ const Home = ({navigation}) => {
       <View>
         {renderHeader()}
         {renderFeatures()}
-        {renderPromoHeader()}
+        {typeUser === 'CHOFER' ? null : renderPromoHeader()}
       </View>
     );
 
@@ -352,29 +391,100 @@ const Home = ({navigation}) => {
     );
 
     return (
-      <FlatList
-        ListHeaderComponent={HeaderComponent}
-        data={specialPromos}
-        contentContainerStyle={{paddingHorizontal: SIZES.padding * 3}}
-        numColumns={2}
-        vc
-        columnWrapperStyle={{justifyContent: 'space-between'}}
-        keyExtractor={item => `${item.id}`}
-        renderItem={renderItem}
-        onPress={item => ModalInfo(item)}
-        showsVerticalScrollIndicator={false}
-        ListFooterComponent={<View style={{marginBottom: 80}}></View>}
-      />
+      <>
+        {typeUser === 'CHOFER' ? (
+          <FlatList
+            ListHeaderComponent={HeaderComponent}
+            data={specialPromos}
+            contentContainerStyle={{paddingHorizontal: SIZES.padding * 3}}
+            numColumns={2}
+            vc
+            columnWrapperStyle={{justifyContent: 'space-between'}}
+            keyExtractor={item => `${item.id}`}
+            // renderItem={renderItem}
+            onPress={item => ModalInfo(item)}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={<View style={{marginBottom: 80}}></View>}
+          />
+        ) : (
+          <FlatList
+            ListHeaderComponent={HeaderComponent}
+            data={specialPromos}
+            contentContainerStyle={{paddingHorizontal: SIZES.padding * 3}}
+            numColumns={2}
+            vc
+            columnWrapperStyle={{justifyContent: 'space-between'}}
+            keyExtractor={item => `${item.id}`}
+            renderItem={renderItem}
+            onPress={item => ModalInfo(item)}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={<View style={{marginBottom: 80}}></View>}
+          />
+        )}
+      </>
     );
   }
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.white}}>
-      {renderPromos()}
+      {typeUser === 'ADMIN' ? (
+        <View>
+          <View style={styles.sectionBoxTopProduct}>
+            {dataTopProducts.map((item, index) => {
+              return (
+                <BoxItemTopProduct
+                  key={index}
+                  bgColor={item.bgColor}
+                  text={item.name}
+                  icon={item.icon}
+                  onPress={() => navigation.navigate(item.desc)}
+                />
+              );
+            })}
+          </View>
+        </View>
+      ) : (
+        renderPromos()
+      )}
     </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
+  btn: {
+    width: '100%',
+  },
+  container1: {
+    flex: 1,
+    justifyContent: 'center',
+    marginHorizontal: 16,
+  },
+  fixToText: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  wrapperHeadTopProducts: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  tittleTopProducts: {
+    color: COLORS.primary,
+    fontFamily: FONTS.SemiBold,
+    fontSize: 20,
+  },
+  textSeeAll: {
+    color: COLORS.black,
+    fontFamily: FONTS.Medium,
+    fontSize: 12,
+  },
+  sectionBoxTopProduct: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  /////
   modalBackGround: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
